@@ -1,15 +1,27 @@
 {
-  "name": "Grokpedia Extension (Unofficial)",
+  "name": "Grokipedia Extension (Unofficial)",
   "version": "0.1",
-  "key": "",
-  "description": "Reroutes requests from Wikipedia over to Grokpedia.",
-  "permissions": [""],
+  "description": "Reroutes requests from Wikipedia over to Grokipedia.",
+  "permissions": ["declarativeNetRequest", "storage"],
+  "host_permissions": ["*://*.wikipedia.org/*"],
   "background": {
     "service_worker": "service-worker.js"
   },
+  "icons": {
+    "16": "grok_logo.png",
+    "32": "grok_logo.png",
+    "48": "grok_logo.png",
+    "128": "grok_logo.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "grok_logo.png"
+    "default_icon": {
+      "16": "grok_logo.png",
+      "32": "grok_logo.png",
+      "48": "grok_logo.png",
+      "128": "grok_logo.png"
+    }
   },
   "manifest_version": 3
 }
+  
