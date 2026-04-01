@@ -1,0 +1,15 @@
+{
+  "name": "Grokpedia Extension (Unofficial)",
+  "version": "0.1",
+  "key": "",
+  "description": "Reroutes requests from Wikipedia over to Grokpedia.",
+  "permissions": [""],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "grok_logo.png"
+  },
+  "manifest_version": 3
+}
