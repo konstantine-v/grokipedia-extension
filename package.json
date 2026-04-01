@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/service-worker.ts src/popup.ts --outdir=. --bundle --format=iife",
+    "dev": "esbuild src/service-worker.ts src/popup.ts --outdir=. --bundle --format=iife --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0"
+  }
+}
