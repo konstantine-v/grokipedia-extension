@@ -1,4 +1,4 @@
-import type { ToggleMessage } from "./types";
+import { DEFAULT_STORAGE, isToggleMessage, readEnabled } from "./types";
 
 const RULE_ID = 1;
 
@@ -20,7 +20,7 @@ const REDIRECT_RULE: chrome.declarativeNetRequest.Rule = {
   },
 };
 
-async function setRedirect(enabled: boolean) {
+async function setRedirect(enabled: boolean): Promise<void> {
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [RULE_ID],
     addRules: enabled ? [REDIRECT_RULE] : [],
@@ -28,20 +28,28 @@ async function setRedirect(enabled: boolean) {
 }
 
 async function isEnabled(): Promise<boolean> {
-  const { enabled } = await chrome.storage.local.get({ enabled: true });
-  return enabled as boolean;
+  const raw = await chrome.storage.local.get(DEFAULT_STORAGE);
+  return readEnabled(raw);
 }
 
-async function syncRedirectState() {
+async function syncRedirectState(): Promise<void> {
   await setRedirect(await isEnabled());
 }
 
-chrome.runtime.onInstalled.addListener(syncRedirectState);
-chrome.runtime.onStartup.addListener(syncRedirectState);
+async function persistToggle(enabled: boolean): Promise<void> {
+  await chrome.storage.local.set({ enabled });
+  await setRedirect(enabled);
+}
 
-chrome.runtime.onMessage.addListener((message: ToggleMessage) => {
-  if (message.type === "toggle") {
-    chrome.storage.local.set({ enabled: message.enabled });
-    setRedirect(message.enabled);
-  }
+chrome.runtime.onInstalled.addListener(() => {
+  void syncRedirectState();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  void syncRedirectState();
+});
+
+chrome.runtime.onMessage.addListener((message: unknown) => {
+  if (!isToggleMessage(message)) return;
+  void persistToggle(message.enabled);
 });

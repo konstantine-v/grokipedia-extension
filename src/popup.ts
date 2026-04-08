@@ -1,12 +1,18 @@
-import type { ToggleMessage } from "./types";
+import { DEFAULT_STORAGE, readEnabled, type ToggleMessage } from "./types";
 
-const toggle = document.getElementById("toggle") as HTMLInputElement;
+const toggle = document.getElementById("toggle");
 
-chrome.storage.local.get({ enabled: true }, (result) => {
-  toggle.checked = result.enabled as boolean;
+if (!(toggle instanceof HTMLInputElement)) {
+  throw new Error('Grokipedia popup: expected <input type="checkbox" id="toggle">');
+}
+
+void chrome.storage.local.get(DEFAULT_STORAGE).then((items) => {
+  toggle.checked = readEnabled(items);
 });
 
 toggle.addEventListener("change", () => {
   const message: ToggleMessage = { type: "toggle", enabled: toggle.checked };
-  chrome.runtime.sendMessage(message);
+  chrome.runtime.sendMessage(message, () => {
+    void chrome.runtime.lastError;
+  });
 });
