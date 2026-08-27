@@ -1,12 +1,11 @@
-import { DEFAULT_STORAGE, readEnabled, type ToggleMessage } from "./types";
+import { DEFAULT_STORAGE, readEnabled, type ExtensionLocalStorage, type ToggleMessage } from "./types";
 
 const toggle = document.getElementById("toggle");
-
 if (!(toggle instanceof HTMLInputElement)) {
-  throw new Error('Grokipedia popup: expected <input type="checkbox" id="toggle">');
+  throw new Error("Missing #toggle");
 }
 
-void chrome.storage.local.get(DEFAULT_STORAGE).then((items) => {
+void chrome.storage.local.get<ExtensionLocalStorage>(DEFAULT_STORAGE).then((items) => {
   toggle.checked = readEnabled(items);
 });
 

@@ -1,4 +1,4 @@
-import { DEFAULT_STORAGE, isToggleMessage, readEnabled } from "./types";
+import { DEFAULT_STORAGE, isToggleMessage, readEnabled, type ExtensionLocalStorage } from "./types";
 
 const RULE_ID = 1;
 
@@ -20,7 +20,7 @@ const REDIRECT_RULE: chrome.declarativeNetRequest.Rule = {
   },
 };
 
-async function setRedirect(enabled: boolean): Promise<void> {
+async function setRedirect(enabled: boolean) {
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [RULE_ID],
     addRules: enabled ? [REDIRECT_RULE] : [],
@@ -28,15 +28,15 @@ async function setRedirect(enabled: boolean): Promise<void> {
 }
 
 async function isEnabled(): Promise<boolean> {
-  const raw = await chrome.storage.local.get(DEFAULT_STORAGE);
+  const raw = await chrome.storage.local.get<ExtensionLocalStorage>(DEFAULT_STORAGE);
   return readEnabled(raw);
 }
 
-async function syncRedirectState(): Promise<void> {
+async function syncRedirectState() {
   await setRedirect(await isEnabled());
 }
 
-async function persistToggle(enabled: boolean): Promise<void> {
+async function persistToggle(enabled: boolean) {
   await chrome.storage.local.set({ enabled });
   await setRedirect(enabled);
 }
