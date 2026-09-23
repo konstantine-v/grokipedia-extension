@@ -2,5 +2,7 @@ CLAUDE.md
 node_modules/
 service-worker.js
 popup.js
+content.js
+content.css
 .claude/
 .cursor/
