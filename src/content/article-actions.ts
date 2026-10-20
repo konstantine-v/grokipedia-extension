@@ -1,5 +1,6 @@
+import type { ReadLaterItem } from "../article";
 import { openInGrok } from "../grok";
-import { addItem, getItems, onItemsChanged, removeItem, type ReadLaterItem } from "../read-later";
+import { addItem, getItems, onItemsChanged, removeItem } from "../read-later";
 import { currentArticle } from "./article";
 import { iconButton, setLabel } from "./dom";
 import { checkIcon, grokIcon, plusIcon } from "./icons";

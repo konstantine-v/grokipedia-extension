@@ -1,12 +1,13 @@
-import { DEFAULT_STORAGE, readEnabled, type ExtensionLocalStorage, type ToggleMessage } from "./types";
+import { readEnabled } from "./storage";
+import type { ToggleMessage } from "./types";
 
 const toggle = document.getElementById("toggle");
 if (!(toggle instanceof HTMLInputElement)) {
   throw new Error("Missing #toggle");
 }
 
-void chrome.storage.local.get<ExtensionLocalStorage>(DEFAULT_STORAGE).then((items) => {
-  toggle.checked = readEnabled(items);
+void readEnabled().then((enabled) => {
+  toggle.checked = enabled;
 });
 
 toggle.addEventListener("change", () => {

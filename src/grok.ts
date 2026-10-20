@@ -1,4 +1,4 @@
-import type { Article } from "./read-later";
+import type { Article } from "./article";
 
 const GROK_BASE = "https://grok.com/";
 

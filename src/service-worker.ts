@@ -1,4 +1,5 @@
-import { DEFAULT_STORAGE, isToggleMessage, readEnabled, type ExtensionLocalStorage } from "./types";
+import { readEnabled, writeEnabled } from "./storage";
+import { isToggleMessage } from "./types";
 
 const RULE_ID = 1;
 
@@ -27,17 +28,12 @@ async function setRedirect(enabled: boolean) {
   });
 }
 
-async function isEnabled(): Promise<boolean> {
-  const raw = await chrome.storage.local.get<ExtensionLocalStorage>(DEFAULT_STORAGE);
-  return readEnabled(raw);
-}
-
 async function syncRedirectState() {
-  await setRedirect(await isEnabled());
+  await setRedirect(await readEnabled());
 }
 
 async function persistToggle(enabled: boolean) {
-  await chrome.storage.local.set({ enabled });
+  await writeEnabled(enabled);
   await setRedirect(enabled);
 }
 

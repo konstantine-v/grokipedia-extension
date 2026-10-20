@@ -4,7 +4,8 @@
   "scripts": {
     "build": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife",
     "dev": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "bun scripts/check.ts && bun test && tsc --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.5",

@@ -1,5 +1,6 @@
+import type { ArticleSlug, ReadLaterItem } from "../article";
 import { openInGrok } from "../grok";
-import { getItems, onItemsChanged, removeItem, type ReadLaterItem } from "../read-later";
+import { getItems, onItemsChanged, removeItem } from "../read-later";
 import { el, iconButton, textButton } from "./dom";
 import { bookIcon, closeIcon, grokIcon, trashIcon } from "./icons";
 
@@ -42,7 +43,7 @@ function renderDropdown(dropdown: HTMLElement, items: ReadLaterItem[], openModal
 
 function createModal() {
   let items: ReadLaterItem[] = [];
-  let confirmingSlug: string | null = null;
+  let confirmingSlug: ArticleSlug | null = null;
 
   const backdrop = el("div", "gpx-backdrop");
   backdrop.hidden = true;
