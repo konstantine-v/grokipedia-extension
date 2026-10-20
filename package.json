@@ -2,8 +2,8 @@
   "private": true,
   "packageManager": "bun@1.3.13",
   "scripts": {
-    "build": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife",
-    "dev": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife --watch",
+    "build": "bun scripts/build.ts",
+    "dev": "bun scripts/build.ts --watch",
     "typecheck": "tsc --noEmit",
     "check": "bun scripts/check.ts && bun test && tsc --noEmit"
   },

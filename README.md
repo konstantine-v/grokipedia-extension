@@ -42,16 +42,18 @@ bun install
 bun run build
 ```
 
-Outputs `service-worker.js`, `popup.js`, `content.js`, and `content.css` to the project root.
+Outputs the unpacked extension into `dist/`.
 
-## Type check
+## Check
 
 ```sh
-bun run typecheck
+bun run check
 ```
+
+Same command CI runs: repo checks, parser tests, and the typecheck.
 
 ## Loading the extension
 
 1. Open `chrome://extensions` in Chrome
 2. Enable **Developer mode**
-3. Click **Load unpacked** and select this directory
+3. Click **Load unpacked** and select the `dist` directory
