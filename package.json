@@ -1,12 +1,13 @@
 {
   "private": true,
+  "packageManager": "bun@1.3.13",
   "scripts": {
     "build": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife",
     "dev": "esbuild src/service-worker.ts src/popup.ts src/content.ts src/content.css --outdir=. --bundle --format=iife --watch",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/chrome": "^0.2.7",
+    "@types/chrome": "^0.3.5",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
   }
