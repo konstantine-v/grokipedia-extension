@@ -9,11 +9,19 @@ export function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-export function iconButton({ className, label, icon }: { className: string; label: string; icon: string }) {
+export function iconButton({
+  className,
+  label,
+  icon,
+}: {
+  className: string;
+  label: string;
+  icon: SVGSVGElement;
+}): HTMLButtonElement {
   const button = el("button", className);
   button.type = "button";
   setLabel(button, label);
-  button.innerHTML = icon;
+  button.append(icon);
   return button;
 }
 

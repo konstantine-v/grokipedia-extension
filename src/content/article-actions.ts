@@ -1,6 +1,5 @@
-import type { ReadLaterItem } from "../article";
 import { openInGrok } from "../grok";
-import { addItem, getItems, onItemsChanged, removeItem } from "../read-later";
+import { addItem, removeItem, type ItemsRenderer } from "../read-later";
 import { currentArticle } from "./article";
 import { iconButton, setLabel } from "./dom";
 import { checkIcon, grokIcon, plusIcon } from "./icons";
@@ -9,25 +8,24 @@ import { showToast } from "./toast";
 const BUTTON_CLASS =
   "text-fg-secondary hover:text-fg-primary flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-surface-l2";
 
-export function injectArticleActions(): void {
+const ADD_LABEL = "Add to read later";
+const REMOVE_LABEL = "Remove from read later";
+
+export function injectArticleActions(): ItemsRenderer | null {
   const article = currentArticle();
   const anchor = document.getElementById("edits-history-btn");
-  if (!article || !anchor) return;
+  if (!article || !anchor) return null;
 
-  const grokButton = iconButton({ className: BUTTON_CLASS, label: "Ask Grok about this article", icon: grokIcon });
+  const grokButton = iconButton({ className: BUTTON_CLASS, label: "Ask Grok about this article", icon: grokIcon() });
   grokButton.addEventListener("click", () => openInGrok(article));
 
-  const saveButton = iconButton({ className: BUTTON_CLASS, label: "Add to read later", icon: plusIcon });
+  const plus = plusIcon();
+  const check = checkIcon();
+  const saveButton = iconButton({ className: BUTTON_CLASS, label: ADD_LABEL, icon: plus });
+  saveButton.ariaPressed = "false";
   let saved = false;
 
-  const render = (items: ReadLaterItem[]) => {
-    saved = items.some((i) => i.slug === article.slug);
-    setLabel(saveButton, saved ? "Remove from read later" : "Add to read later");
-    saveButton.ariaPressed = String(saved);
-    saveButton.innerHTML = saved ? checkIcon : plusIcon;
-  };
-
-  saveButton.addEventListener("click", async () => {
+  const toggleSaved = async (): Promise<void> => {
     if (saved) {
       await removeItem(article.slug);
       showToast("Removed from your reading list");
@@ -35,9 +33,15 @@ export function injectArticleActions(): void {
       await addItem(article);
       showToast("Added to your reading list");
     }
-  });
+  };
+  saveButton.addEventListener("click", () => void toggleSaved());
 
   anchor.after(grokButton, saveButton);
-  void getItems().then(render);
-  onItemsChanged(render);
+
+  return (items) => {
+    saved = items.some((item) => item.slug === article.slug);
+    setLabel(saveButton, saved ? REMOVE_LABEL : ADD_LABEL);
+    saveButton.ariaPressed = String(saved);
+    saveButton.replaceChildren(saved ? check : plus);
+  };
 }

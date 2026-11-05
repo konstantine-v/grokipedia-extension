@@ -1,51 +1,35 @@
-import { readEnabled, writeEnabled } from "./storage";
-import { isToggleMessage } from "./types";
+import { GROKIPEDIA_ARTICLE_SUBSTITUTION, WIKIPEDIA_ARTICLE_FILTER } from "./redirect";
+import { onEnabledChanged, readEnabled } from "./storage";
 
 const RULE_ID = 1;
-
-const GROKIPEDIA_BASE = "https://grokipedia.com/";
 
 const REDIRECT_RULE: chrome.declarativeNetRequest.Rule = {
   id: RULE_ID,
   priority: 1,
   action: {
     type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
-    redirect: {
-      regexSubstitution: `${GROKIPEDIA_BASE}page/\\1`,
-    },
+    redirect: { regexSubstitution: GROKIPEDIA_ARTICLE_SUBSTITUTION },
   },
   condition: {
-    regexFilter: "^https://(?:[a-z-]+\\.)?wikipedia\\.org/wiki/(.+)$",
+    regexFilter: WIKIPEDIA_ARTICLE_FILTER,
     isUrlFilterCaseSensitive: false,
     resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],
   },
 };
 
-async function setRedirect(enabled: boolean) {
+async function setRedirect(enabled: boolean): Promise<void> {
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [RULE_ID],
     addRules: enabled ? [REDIRECT_RULE] : [],
   });
 }
 
-async function syncRedirectState() {
-  await setRedirect(await readEnabled());
-}
-
-async function persistToggle(enabled: boolean) {
-  await writeEnabled(enabled);
-  await setRedirect(enabled);
-}
-
+// Dynamic rules persist across browser restarts, so the rule only needs to be
+// (re)applied on install or update, and whenever the stored toggle changes.
 chrome.runtime.onInstalled.addListener(() => {
-  void syncRedirectState();
+  void readEnabled().then(setRedirect);
 });
 
-chrome.runtime.onStartup.addListener(() => {
-  void syncRedirectState();
-});
-
-chrome.runtime.onMessage.addListener((message: unknown) => {
-  if (!isToggleMessage(message)) return;
-  void persistToggle(message.enabled);
+onEnabledChanged((enabled) => {
+  void setRedirect(enabled);
 });

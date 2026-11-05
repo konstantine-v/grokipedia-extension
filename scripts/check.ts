@@ -21,6 +21,9 @@ export function sourceErrors(file: string, text: string): string[] {
       `${file}: a type argument here is not checked at runtime. Narrow with instanceof, or parse in ${STORAGE_FILE}.`,
     );
   }
+  if (/\b(?:innerHTML|outerHTML|insertAdjacentHTML)\b/.test(text)) {
+    errors.push(`${file}: build DOM with createElement or createElementNS, not HTML strings.`);
+  }
   if (file !== STORAGE_FILE && text.includes("chrome.storage")) {
     errors.push(`${file}: chrome.storage belongs in ${STORAGE_FILE}.`);
   }
@@ -80,6 +83,7 @@ const pastMistakes: readonly (readonly [string, string])[] = [
   ["src/popup.ts", `result.enabled as boolean`],
   ["src/types.ts", `const o = value as Record<string, unknown>`],
   ["src/service-worker.ts", `chrome.storage.local.get<ExtensionLocalStorage>(DEFAULT_STORAGE)`],
+  ["src/content/dom.ts", `button.innerHTML = icon`],
 ];
 
 const errors: string[] = [];

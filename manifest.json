@@ -3,7 +3,7 @@
   "version": "0.1",
   "description": "Reroutes requests from Wikipedia over to Grokipedia.",
   "permissions": ["declarativeNetRequest", "storage"],
-  "host_permissions": ["*://*.wikipedia.org/*"],
+  "host_permissions": ["https://*.wikipedia.org/*"],
   "background": {
     "service_worker": "service-worker.js"
   },
@@ -32,4 +32,3 @@
   },
   "manifest_version": 3
 }
-  
