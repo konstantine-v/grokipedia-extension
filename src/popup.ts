@@ -1,5 +1,4 @@
-import { readEnabled } from "./storage";
-import type { ToggleMessage } from "./types";
+import { readEnabled, writeEnabled } from "./storage";
 
 const toggle = document.getElementById("toggle");
 if (!(toggle instanceof HTMLInputElement)) {
@@ -8,11 +7,9 @@ if (!(toggle instanceof HTMLInputElement)) {
 
 void readEnabled().then((enabled) => {
   toggle.checked = enabled;
+  toggle.disabled = false;
 });
 
 toggle.addEventListener("change", () => {
-  const message: ToggleMessage = { type: "toggle", enabled: toggle.checked };
-  chrome.runtime.sendMessage(message, () => {
-    void chrome.runtime.lastError;
-  });
+  void writeEnabled(toggle.checked);
 });

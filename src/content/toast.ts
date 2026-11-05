@@ -1,3 +1,5 @@
+import { el } from "./dom";
+
 const TOAST_DURATION_MS = 2500;
 
 let current: { node: HTMLElement; timer: number } | null = null;
@@ -8,15 +10,14 @@ export function showToast(message: string): void {
     current.node.remove();
   }
 
-  const node = document.createElement("div");
-  node.className = "gpx-toast";
+  const node = el("div", "gpx-toast", message);
   node.role = "status";
-  node.textContent = message;
   document.body.append(node);
 
+  // A newer toast clears this timer, so when it fires `node` is still the current toast.
   const timer = window.setTimeout(() => {
     node.remove();
-    if (current?.node === node) current = null;
+    current = null;
   }, TOAST_DURATION_MS);
   current = { node, timer };
 }

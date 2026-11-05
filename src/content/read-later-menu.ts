@@ -1,6 +1,6 @@
 import type { ArticleSlug, ReadLaterItem } from "../article";
 import { openInGrok } from "../grok";
-import { getItems, onItemsChanged, removeItem } from "../read-later";
+import { removeItem, type ItemsRenderer } from "../read-later";
 import { el, iconButton, textButton } from "./dom";
 import { bookIcon, closeIcon, grokIcon, trashIcon } from "./icons";
 
@@ -10,17 +10,20 @@ const CLOSE_DELAY_MS = 150;
 const HEADER_BUTTON_CLASS =
   "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-fg-secondary transition hover:bg-surface-l1";
 
+const dateFormat = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" });
+
+type Modal = {
+  open(): void;
+  update(items: readonly ReadLaterItem[]): void;
+};
+
 function articleLink(item: ReadLaterItem, className: string): HTMLAnchorElement {
   const link = el("a", className, item.title);
   link.href = item.url;
   return link;
 }
 
-function formatDate(timestamp: number): string {
-  return new Date(timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
-
-function renderDropdown(dropdown: HTMLElement, items: ReadLaterItem[], openModal: () => void): void {
+function renderDropdown(dropdown: HTMLElement, items: readonly ReadLaterItem[], openModal: () => void): void {
   dropdown.replaceChildren(el("div", "gpx-dropdown-title", "Read later"));
 
   if (items.length === 0) {
@@ -41,8 +44,8 @@ function renderDropdown(dropdown: HTMLElement, items: ReadLaterItem[], openModal
   dropdown.append(list, viewAll);
 }
 
-function createModal() {
-  let items: ReadLaterItem[] = [];
+function createModal(): Modal {
+  let items: readonly ReadLaterItem[] = [];
   let confirmingSlug: ArticleSlug | null = null;
 
   const backdrop = el("div", "gpx-backdrop");
@@ -53,7 +56,7 @@ function createModal() {
   dialog.ariaLabel = "Read later";
 
   const header = el("div", "gpx-modal-header");
-  const closeButton = iconButton({ className: "gpx-icon-btn", label: "Close", icon: closeIcon });
+  const closeButton = iconButton({ className: "gpx-icon-btn", label: "Close", icon: closeIcon() });
   header.append(el("h2", "gpx-modal-title", "Read later"), closeButton);
 
   const body = el("div", "gpx-modal-body");
@@ -63,7 +66,8 @@ function createModal() {
   const renderRow = (item: ReadLaterItem): HTMLLIElement => {
     const row = el("li", "gpx-row");
     const info = el("div", "gpx-row-info");
-    info.append(articleLink(item, "gpx-row-title"), el("span", "gpx-row-date", `Added ${formatDate(item.addedAt)}`));
+    const added = el("span", "gpx-row-date", `Added ${dateFormat.format(item.addedAt)}`);
+    info.append(articleLink(item, "gpx-row-title"), added);
 
     const actions = el("div", "gpx-row-actions");
     if (confirmingSlug === item.slug) {
@@ -79,12 +83,12 @@ function createModal() {
       });
       actions.append(el("span", "gpx-confirm-text", "Remove?"), yes, cancel);
     } else {
-      const grok = iconButton({ className: "gpx-icon-btn", label: "Open in Grok", icon: grokIcon });
+      const grok = iconButton({ className: "gpx-icon-btn", label: "Open in Grok", icon: grokIcon() });
       grok.addEventListener("click", () => openInGrok(item));
       const remove = iconButton({
         className: "gpx-icon-btn gpx-icon-btn-danger",
         label: "Remove from read later",
-        icon: trashIcon,
+        icon: trashIcon(),
       });
       remove.addEventListener("click", () => {
         confirmingSlug = item.slug;
@@ -133,21 +137,22 @@ function createModal() {
 
   return {
     open,
-    update(next: ReadLaterItem[]) {
+    update(next) {
       items = next;
-      render();
+      // A hidden modal is rebuilt by open(), so skip the work until then.
+      if (!backdrop.hidden) render();
     },
   };
 }
 
-export function injectReadLaterMenu(): void {
+export function injectReadLaterMenu(): ItemsRenderer | null {
   const anchor = document.getElementById("theme-toggle-desktop");
-  if (!anchor) return;
+  if (!anchor) return null;
 
   const modal = createModal();
 
   const wrapper = el("div", "gpx-menu");
-  const button = iconButton({ className: HEADER_BUTTON_CLASS, label: "Read later", icon: bookIcon });
+  const button = iconButton({ className: HEADER_BUTTON_CLASS, label: "Read later", icon: bookIcon() });
   const dropdown = el("div", "gpx-dropdown");
   dropdown.hidden = true;
   wrapper.append(button, dropdown);
@@ -177,12 +182,10 @@ export function injectReadLaterMenu(): void {
   });
   button.addEventListener("click", openModal);
 
-  const render = (items: ReadLaterItem[]) => {
+  anchor.after(wrapper);
+
+  return (items) => {
     renderDropdown(dropdown, items, openModal);
     modal.update(items);
   };
-
-  anchor.after(wrapper);
-  void getItems().then(render);
-  onItemsChanged(render);
 }

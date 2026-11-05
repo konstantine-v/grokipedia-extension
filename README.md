@@ -20,7 +20,7 @@ Examples:
 
 `<lang>` is a single hostname label of letters and hyphens (for example `en`, `zh-yue`). Nested hosts such as `en.m.wikipedia.org` are not matched.
 
-The toolbar popup can turn the redirect on or off. It is on by default.
+The toolbar popup can turn the redirect on or off. It is on by default. The setting lives in `chrome.storage.local`, and the service worker updates the redirect rule whenever it changes.
 
 ## Grokipedia page additions
 
@@ -50,7 +50,7 @@ Outputs the unpacked extension into `dist/`.
 bun run check
 ```
 
-Same command CI runs: repo checks, parser tests, and the typecheck.
+Same command CI runs: repo checks, unit tests, and a strict typecheck of `src/` (against the Chrome types) and of `scripts/` and `test/` (against the Bun types).
 
 ## Loading the extension
 

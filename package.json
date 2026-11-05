@@ -1,14 +1,15 @@
 {
   "private": true,
-  "packageManager": "bun@1.3.13",
+  "packageManager": "bun@1.4.4",
   "scripts": {
     "build": "bun scripts/build.ts",
     "dev": "bun scripts/build.ts --watch",
-    "typecheck": "tsc --noEmit",
-    "check": "bun scripts/check.ts && bun test && tsc --noEmit"
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.bun.json",
+    "check": "bun scripts/check.ts && bun test && bun run typecheck"
   },
   "devDependencies": {
-    "@types/chrome": "^0.3.5",
+    "@types/bun": "^1.4.4",
+    "@types/chrome": "^0.3.7",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
   }

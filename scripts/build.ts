@@ -22,4 +22,5 @@ const args = [
 if (watch) args.push("--watch");
 
 const build = spawnSync("esbuild", args, { stdio: "inherit" });
-if (build.status !== 0) process.exit(build.status === null ? 1 : build.status);
+if (build.error) throw build.error;
+if (build.status !== 0) process.exit(build.status ?? 1);

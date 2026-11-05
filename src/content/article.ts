@@ -1,10 +1,8 @@
-import { parseArticle, type Article } from "../article";
-
-const PAGE_PREFIX = "/page/";
+import { articleSlugFromPath, parseArticle, type Article } from "../article";
 
 export function currentArticle(): Article | null {
-  if (!location.pathname.startsWith(PAGE_PREFIX)) return null;
-  const slug = decodeURIComponent(location.pathname.slice(PAGE_PREFIX.length));
+  const slug = articleSlugFromPath(location.pathname);
+  if (!slug) return null;
   const title = document.querySelector("h1")?.textContent?.trim() || slug.replaceAll("_", " ");
   const canonical = document.querySelector('link[rel="canonical"]');
   const url = canonical instanceof HTMLLinkElement ? canonical.href : location.href;

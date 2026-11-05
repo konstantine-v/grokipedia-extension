@@ -255,6 +255,11 @@ html.dark {
   color: #ffffff;
 }
 
+.gpx-btn-danger:hover {
+  background: var(--gpx-danger);
+  opacity: 0.9;
+}
+
 .gpx-toast {
   position: fixed;
   bottom: 24px;
@@ -276,9 +281,4 @@ html.dark {
     opacity: 0;
     transform: translate(-50%, 8px);
   }
-}
-
-.gpx-btn-danger:hover {
-  background: var(--gpx-danger);
-  opacity: 0.9;
 }
